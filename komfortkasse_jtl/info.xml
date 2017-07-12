@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+<jtlshop3plugin>
+    <Name>Komfortkasse JTL</Name>
+    <Description>Komfortkasse Integration für den JTL-Shop4</Description>
+    <Author>Carsten Harnisch, ebd</Author>
+    <URL>https://komfortkasse.eu/</URL>
+    <XMLVersion>100</XMLVersion>
+    <Shop4Version>400</Shop4Version>
+    <PluginID>komfortkasse_jtl</PluginID>
+    <Install>
+        <Version nr="100">
+            <CreateDate>2017-07-12</CreateDate>
+        </Version>
+        <Hooks>
+            <Hook id="132">kk-api-controller.php</Hook>
+            <Hook id="2">kk-orderready-controller.php</Hook>
+        </Hooks>
+        <Adminmenu>
+            <Customlink sort="1">
+                <Name>Einstellungen</Name>
+                <Filename>settings.php</Filename>
+            </Customlink>
+        </Adminmenu>
+    </Install>
+</jtlshop3plugin>
