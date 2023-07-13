@@ -1,25 +1,169 @@
 <?xml version='1.0' encoding="ISO-8859-1"?>
-<jtlshop3plugin>
-    <Name>Komfortkasse JTL</Name>
-    <Description>Komfortkasse Integration für den JTL-Shop4</Description>
-    <Author>Carsten Harnisch, ebd</Author>
-    <URL>https://komfortkasse.eu/</URL>
-    <XMLVersion>100</XMLVersion>
-    <Shop4Version>400</Shop4Version>
-    <PluginID>komfortkasse_jtl</PluginID>
-    <Install>
-        <Version nr="100">
-            <CreateDate>2017-07-12</CreateDate>
-        </Version>
-        <Hooks>
-            <Hook id="132">kk-api-controller.php</Hook>
-            <Hook id="2">kk-orderready-controller.php</Hook>
-        </Hooks>
-        <Adminmenu>
-            <Customlink sort="1">
-                <Name>Einstellungen</Name>
-                <Filename>settings.php</Filename>
-            </Customlink>
-        </Adminmenu>
-    </Install>
-</jtlshop3plugin>
+<jtlshopplugin>
+	<Name>Komfortkasse JTL</Name>
+	<Description>Komfortkasse Integration für den JTL-Shop 5</Description>
+	<Author>Komfortkasse Integration Team, based on work from Carsten
+		Harnisch, ebd
+	</Author>
+	<URL>https://komfortkasse.eu/</URL>
+	<XMLVersion>100</XMLVersion>
+	<ShopVersion>5.2.0</ShopVersion>
+	<PluginID>komfortkasse_jtl</PluginID>
+	<CreateDate>2023-07-12</CreateDate>
+	<Version>1.9.6</Version>
+	<Install>
+		<Adminmenu>
+			<Customlink sort="1">
+				<Name>Status</Name>
+				<Filename>status.php</Filename>
+			</Customlink>
+			<Settingslink sort="2">
+				<Name>Einstellungen</Name>
+				<Setting type="text" sort="1000" conf="N">
+					<Name>Allgemein</Name>
+					<ValueName>Allgemein</ValueName>
+				</Setting>
+				<Setting type="checkbox" initialValue="on" sort="1010" conf="Y">
+					<Name>Export Bestellungen</Name>
+					<Description>Export von Bestellungen zu Komfortkasse aktiv</Description>
+					<ValueName>export</ValueName>
+				</Setting>
+				<Setting type="checkbox" initialValue="on" sort="1020" conf="Y">
+					<Name>Update von Bestellungen</Name>
+					<Description>Änderung der Bestellungen aktivieren</Description>
+					<ValueName>update</ValueName>
+				</Setting>
+				
+				<Setting type="text" sort="3000" conf="N">
+					<Name>Vorkasse</Name>
+					<ValueName>Vorkasse</ValueName>
+				</Setting>
+				<Setting type="selectbox" initialValue="1" sort="3005" conf="Y" multiple="Y">
+					<Name>Zahlungsmethoden</Name>
+					<ValueName>payment_methods</ValueName>
+					<OptionsSource>
+						<File>select_payment_method.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="1" sort="3010" conf="Y" multiple="Y">
+					<Name>Status offen</Name>
+					<ValueName>status_open</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="3" sort="3020" conf="Y" multiple="N">
+					<Name>Status bezahlt</Name>
+					<ValueName>status_paid</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="-1" sort="3030" conf="Y" multiple="N">
+					<Name>Status Storno</Name>
+					<ValueName>status_cancelled</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+
+				<Setting type="text" sort="5000" conf="N">
+					<Name>Rechnung</Name>
+					<ValueName>Rechnung</ValueName>
+				</Setting>
+				<Setting type="selectbox" initialValue="3" sort="5005" conf="Y" multiple="Y">
+					<Name>Zahlungsmethoden</Name>
+					<ValueName>payment_methods_invoice</ValueName>
+					<OptionsSource>
+						<File>select_payment_method.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="4" sort="5010" conf="Y" multiple="Y">
+					<Name>Status offen</Name>
+					<ValueName>status_open_invoice</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="3" sort="5020" conf="Y" multiple="N">
+					<Name>Status bezahlt</Name>
+					<ValueName>status_paid_invoice</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="-1" sort="5030" conf="Y" multiple="N">
+					<Name>Status Storno</Name>
+					<ValueName>status_cancelled_invoice</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				
+				<Setting type="text" sort="7000" conf="N">
+					<Name>Nachnahme</Name>
+					<ValueName>Nachnahme</ValueName>
+				</Setting>
+				<Setting type="selectbox" initialValue="2" sort="7005" conf="Y" multiple="Y">
+					<Name>Zahlungsmethoden</Name>
+					<ValueName>payment_methods_cod</ValueName>
+					<OptionsSource>
+						<File>select_payment_method.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="4" sort="7010" conf="Y" multiple="Y">
+					<Name>Status offen</Name>
+					<ValueName>status_open_cod</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="3" sort="7020" conf="Y" multiple="N">
+					<Name>Status bezahlt</Name>
+					<ValueName>status_paid_cod</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>
+				<Setting type="selectbox" initialValue="-1" sort="7030" conf="Y" multiple="N">
+					<Name>Status Storno</Name>
+					<ValueName>status_cancelled_cod</ValueName>
+					<OptionsSource>
+						<File>select_order_status.php</File>
+					</OptionsSource>
+				</Setting>		
+				
+				<Setting type="text" sort="9000" conf="N">
+					<Name>Verbindung</Name>
+					<ValueName>Verbindung</ValueName>
+					<Description>Felder werden automatisch befüllt. Nur ändern/leeren, wenn die Verbindung zu Komfortkasse neu aufgebaut werden soll.</Description>
+				</Setting>
+				<Setting type="text" initialValue="" sort="9010" conf="Y">
+					<Name>Verschlüsselung</Name>
+					<ValueName>encryption</ValueName>
+				</Setting>
+				<Setting type="text" initialValue="" sort="9020" conf="Y">
+					<Name>Access Code</Name>
+					<ValueName>accesscode</ValueName>
+				</Setting>
+				<Setting type="text" initialValue="" sort="9030" conf="Y">
+					<Name>API Key</Name>
+					<ValueName>apikey</ValueName>
+				</Setting>
+				<Setting type="text" initialValue="" sort="9040" conf="Y">
+					<Name>Public Key</Name>
+					<ValueName>publickey</ValueName>
+				</Setting>
+				<Setting type="text" initialValue="" sort="9050" conf="Y">
+					<Name>Private Key</Name>
+					<ValueName>privatekey</ValueName>
+				</Setting>
+										
+			</Settingslink>
+		</Adminmenu>
+		<Hooks>
+			<Hook id="132">kk-api-controller.php</Hook>
+			<Hook id="2">kk-orderready-controller.php</Hook>
+		</Hooks>
+	</Install>
+</jtlshopplugin>
