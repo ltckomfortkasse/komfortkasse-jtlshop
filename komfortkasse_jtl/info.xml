@@ -10,7 +10,7 @@
 	<ShopVersion>5.2.0</ShopVersion>
 	<PluginID>komfortkasse_jtl</PluginID>
 	<CreateDate>2023-07-12</CreateDate>
-	<Version>1.9.6</Version>
+	<Version>1.9.7</Version>
 	<Install>
 		<Adminmenu>
 			<Customlink sort="1">

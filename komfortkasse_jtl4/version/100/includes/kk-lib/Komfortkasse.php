@@ -370,39 +370,58 @@ class Komfortkasse {
 		}
 		
 		$order = Komfortkasse_Order::getOrder ( $id );
+		if (! $order) {
+			return;
+		}
 		$order ['type'] = self::getOrderType ( $order );
-		
+
 		// See if order is relevant.
 		if (! self::isOpen ( $order )) {
 			return;
 		}
-		if (method_exists ( Komfortkasse_Order, 'isOpen' ) && ! Komfortkasse_Order::isOpen ( $order )) {
+		if (method_exists ( 'Komfortkasse_Order', 'isOpen' ) && ! Komfortkasse_Order::isOpen ( $order )) {
 			return;
 		}
-		
+
+		// API key and access code hash are sent with the request, so only ever use TLS.
+		// Without the https stream wrapper (no openssl extension) skip the notification
+		// instead of falling back to plain HTTP; Komfortkasse still picks the order up
+		// on its regular sync.
+		if (! in_array ( 'https', stream_get_wrappers () )) {
+			return;
+		}
+
 		$queryRaw = http_build_query ( $order );
-		
+
 		$queryEnc = Komfortkasse::kkencrypt ( $queryRaw );
-		
+
 		$query = http_build_query ( array (
 				'q' => $queryEnc,
 				'hash' => Komfortkasse_Config::getConfig ( Komfortkasse_Config::accesscode, $order ),
-				'key' => Komfortkasse_Config::getConfig ( Komfortkasse_Config::apikey, $order ) 
+				'key' => Komfortkasse_Config::getConfig ( Komfortkasse_Config::apikey, $order )
 		) );
-		
+
+		// no redirects: a 307/308 would resend the POST body (incl. API key) elsewhere
 		$contextData = array (
 				'method' => 'POST',
 				'timeout' => 2,
+				'follow_location' => 0,
 				'header' => "Connection: close\r\n" . 'Content-Length: ' . strlen ( $query ) . "\r\n",
-				'content' => $query 
+				'content' => $query
 		);
-		
+
+		$sslData = array (
+				'verify_peer' => true,
+				'verify_peer_name' => true,
+				'peer_name' => 'ssl.komfortkasse.eu'
+		);
+
 		$context = stream_context_create ( array (
-				'http' => $contextData 
+				'http' => $contextData,
+				'ssl' => $sslData
 		) );
-		
-		// Development: http://localhost:8080/kkos01/api...
-		$result = @file_get_contents ( 'http://api.komfortkasse.eu/api/shop/neworder.jsf', false, $context );
+
+		$result = @file_get_contents ( 'https://ssl.komfortkasse.eu/api/shop/neworder.jsf', false, $context );
 	}
 	
 	// end notifyorder()

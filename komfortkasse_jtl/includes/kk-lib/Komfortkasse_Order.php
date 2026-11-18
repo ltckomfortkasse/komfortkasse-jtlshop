@@ -11,6 +11,14 @@ use stdClass;
  * @version 1.0.0-JTL
  */
 class Komfortkasse_Order {
+	/**
+	 * ISO-8859-1 -> UTF-8 as utf8_encode() did (deprecated since PHP 8.2), same output.
+	 */
+	public static function latin1ToUtf8($s) {
+		$s = ( string ) $s;
+		return function_exists ( 'mb_convert_encoding' ) ? mb_convert_encoding ( $s, 'UTF-8', 'ISO-8859-1' ) : utf8_encode ( $s );
+	}
+
 	private static function createInClause($arr) {
 		if (! is_array ( $arr )) {
 			$arr = explode ( ',', $arr );
@@ -104,6 +112,9 @@ class Komfortkasse_Order {
 	public static function getOrder($number, $type = 'cBestellNr') {
 		if ($type == 'cBestellNr') {
 		    $obj = \JTL\Shop::Container()->getDB()->select('tbestellung', 'cBestellNr', $number);
+			if (empty ( $obj )) {
+				return null;
+			}
 			$number = $obj->kBestellung;
 		}
 		$oBestellung = new \JTL\Checkout\Bestellung ( $number );
@@ -122,11 +133,11 @@ class Komfortkasse_Order {
 		$ret ['number'] = $oBestellung->cBestellNr;
 		$ret ['status'] = $oBestellung->cStatus;
 		$ret ['date'] = date ( 'd.m.Y', strtotime ( $oBestellung->dErstelldatum_en ) );
-		$ret ['email'] = utf8_encode ($oBestellung->oKunde->cMail);
+		$ret ['email'] = self::latin1ToUtf8 ( $oBestellung->oKunde->cMail);
 		$ret ['customer_number'] = $oBestellung->oKunde->cKundenNr;
 		try {
 			$ret ['payment_method'] = $oBestellung->kZahlungsart;
-			$ret ['payment_name'] = utf8_encode ($oBestellung->cZahlungsartName);
+			$ret ['payment_name'] = self::latin1ToUtf8 ( $oBestellung->cZahlungsartName);
 		} catch ( Exception $e ) {
 		}
 		$ret ['amount'] = $oBestellung->fGesamtsumme;
@@ -135,26 +146,26 @@ class Komfortkasse_Order {
 
 		$shippingAddress = $oBestellung->Lieferadresse;
 		if ($shippingAddress) {
-			$ret ['delivery_firstname'] = utf8_encode ( $shippingAddress->cVorname );
-			$ret ['delivery_lastname'] = utf8_encode ( $shippingAddress->cNachname );
-			$ret ['delivery_company'] = utf8_encode ( $shippingAddress->cFirma );
-			$ret ['delivery_street'] = utf8_encode ( $shippingAddress->cStrasse . ' ' . $shippingAddress->cHausnummer );
-			$ret ['delivery_postcode'] = utf8_encode ( $shippingAddress->cPLZ );
-			$ret ['delivery_city'] = utf8_encode ( $shippingAddress->cOrt );
-			$ret ['delivery_countrycode'] = utf8_encode ( $shippingAddress->cLand );
+			$ret ['delivery_firstname'] = self::latin1ToUtf8 ( $shippingAddress->cVorname );
+			$ret ['delivery_lastname'] = self::latin1ToUtf8 ( $shippingAddress->cNachname );
+			$ret ['delivery_company'] = self::latin1ToUtf8 ( $shippingAddress->cFirma );
+			$ret ['delivery_street'] = self::latin1ToUtf8 ( $shippingAddress->cStrasse . ' ' . $shippingAddress->cHausnummer );
+			$ret ['delivery_postcode'] = self::latin1ToUtf8 ( $shippingAddress->cPLZ );
+			$ret ['delivery_city'] = self::latin1ToUtf8 ( $shippingAddress->cOrt );
+			$ret ['delivery_countrycode'] = self::latin1ToUtf8 ( $shippingAddress->cLand );
 		}
 
 		$billingAddress = $oBestellung->oRechnungsadresse;
 		if ($billingAddress) {
 			// de-DE
 			$ret ['language_code'] = strtolower($oSprache->cISO) . "-" . strtoupper($oBestellung->oRechnungsadresse->cLand);
-			$ret ['billing_firstname'] = utf8_encode ( $billingAddress->cVorname );
-			$ret ['billing_lastname'] = utf8_encode ( $billingAddress->cNachname );
-			$ret ['billing_company'] = utf8_encode ( $billingAddress->cFirma );
-			$ret ['billing_street'] = utf8_encode ( $billingAddress->cStrasse . ' ' . $billingAddress->cHausnummer );
-			$ret ['billing_postcode'] = utf8_encode ( $billingAddress->cPLZ );
-			$ret ['billing_city'] = utf8_encode ( $billingAddress->cOrt );
-			$ret ['billing_countrycode'] = utf8_encode ( $billingAddress->cLand );
+			$ret ['billing_firstname'] = self::latin1ToUtf8 ( $billingAddress->cVorname );
+			$ret ['billing_lastname'] = self::latin1ToUtf8 ( $billingAddress->cNachname );
+			$ret ['billing_company'] = self::latin1ToUtf8 ( $billingAddress->cFirma );
+			$ret ['billing_street'] = self::latin1ToUtf8 ( $billingAddress->cStrasse . ' ' . $billingAddress->cHausnummer );
+			$ret ['billing_postcode'] = self::latin1ToUtf8 ( $billingAddress->cPLZ );
+			$ret ['billing_city'] = self::latin1ToUtf8 ( $billingAddress->cOrt );
+			$ret ['billing_countrycode'] = self::latin1ToUtf8 ( $billingAddress->cLand );
 		} else {
 			$ret ['language_code'] = strtolower($oSprache->cISO) . "-" . strtoupper($oBestellung->oKunde->cLand);
 		}
@@ -194,6 +205,9 @@ class Komfortkasse_Order {
 		}
 
 		$obj = \JTL\Shop::Container()->getDB()->select('tbestellung', 'cBestellNr', $order['number']);
+		if (empty ( $obj )) {
+			return;
+		}
 		$oBestellung = new \JTL\Checkout\Bestellung ( $obj->kBestellung );
 		$oBestellung->fuelleBestellung ( 1, 0, false );
 

@@ -72,13 +72,14 @@ class KK_Controller {
 		$filters = array (
 				'order_id' => 'int',
 				'publicKey' => 'despace',
-				'o' => (($_REQUEST['action'] == 'updateorders') ? 'urldecode' : 'all')
+				'o' => ((isset ( $_REQUEST ['action'] ) && $_REQUEST ['action'] == 'updateorders') ? 'urldecode' : 'all')
 		);
-		
+
 		$this->request_array = array ();
 		foreach ( $allowed_keys as $k ) {
-			if (isset ( $_REQUEST [$k] )) {
-				$this->request_array [$k] = $this->filterData ( $_REQUEST [$k], $filters [$k] );
+			// only string parameters; arrays would otherwise cause TypeErrors in urldecode()
+			if (isset ( $_REQUEST [$k] ) && is_string ( $_REQUEST [$k] )) {
+				$this->request_array [$k] = $this->filterData ( $_REQUEST [$k], isset ( $filters [$k] ) ? $filters [$k] : 'all' );
 			}
 		}
 	}
