@@ -225,7 +225,7 @@ class Komfortkasse_Order {
 			$zahlungseingang->fBetrag           = $oBestellung->fGesamtsumme;
 			$zahlungseingang->cISO              = $oBestellung->Waehrung->cName;
 			$zahlungseingang->cAbgeholt         = 'N';
-			$zahlungseingang->dZeit             = date('Y-m-d H:m:s');
+			$zahlungseingang->dZeit             = date('Y-m-d H:i:s');
 			// this is the tx-id
 			$zahlungseingang->cHinweis         = $callbackid;
 			\JTL\Shop::Container()->getDB()->insert('tzahlungseingang', $zahlungseingang);
