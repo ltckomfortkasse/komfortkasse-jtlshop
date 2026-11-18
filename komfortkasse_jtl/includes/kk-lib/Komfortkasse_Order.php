@@ -19,6 +19,23 @@ class Komfortkasse_Order {
 		return function_exists ( 'mb_convert_encoding' ) ? mb_convert_encoding ( $s, 'UTF-8', 'ISO-8859-1' ) : utf8_encode ( $s );
 	}
 
+	/**
+	 * ISO 4217 code of the order currency (twaehrung.cISO, e.g. "EUR").
+	 * cName is the display name maintained in the shop/JTL-Wawi (e.g. "Euro"), not a code.
+	 */
+	private static function currencyCode($currency) {
+		if (empty ( $currency )) {
+			return null;
+		}
+		if (method_exists ( $currency, 'getCode' ) && $currency->getCode ()) {
+			return $currency->getCode ();
+		}
+		if (! empty ( $currency->cISO )) {
+			return $currency->cISO;
+		}
+		return $currency->cName;
+	}
+
 	private static function createInClause($arr) {
 		if (! is_array ( $arr )) {
 			$arr = explode ( ',', $arr );
@@ -57,7 +74,8 @@ class Komfortkasse_Order {
 
 			$where = array();
 
-			$where[] = "b.dErstellt > {$minDate}";
+			// quoted: unquoted, MySQL computed 2025-11-18 as 1996 and the filter matched every order
+			$where[] = "b.dErstellt > '{$minDate}'";
 
 			$paymentMethods_prepaid 	= Komfortkasse_Config::getConfig ( Komfortkasse_Config::payment_methods);
 			$paymentMethods_cod 		= Komfortkasse_Config::getConfig ( Komfortkasse_Config::payment_methods_cod);
@@ -141,7 +159,7 @@ class Komfortkasse_Order {
 		} catch ( Exception $e ) {
 		}
 		$ret ['amount'] = $oBestellung->fGesamtsumme;
-		$ret ['currency_code'] = $oBestellung->Waehrung->cName;
+		$ret ['currency_code'] = self::currencyCode ( $oBestellung->Waehrung );
 		$ret ['exchange_rate'] = $oBestellung->Waehrung->fFaktor;
 
 		$shippingAddress = $oBestellung->Lieferadresse;
@@ -223,7 +241,7 @@ class Komfortkasse_Order {
 			$zahlungseingang->kBestellung       = $oBestellung->kBestellung;
 			$zahlungseingang->cZahlungsanbieter = 'Komfortkasse';
 			$zahlungseingang->fBetrag           = $oBestellung->fGesamtsumme;
-			$zahlungseingang->cISO              = $oBestellung->Waehrung->cName;
+			$zahlungseingang->cISO              = self::currencyCode ( $oBestellung->Waehrung );
 			$zahlungseingang->cAbgeholt         = 'N';
 			$zahlungseingang->dZeit             = date('Y-m-d H:i:s');
 			// this is the tx-id
