@@ -589,7 +589,7 @@ class Komfortkasse {
 	 *        	
 	 * @return mixed
 	 */
-	protected static function kkcrypterror($encryption) {
+	protected static function kkcrypterror($encryption = null) {
 		if (! $encryption) {
 			$encryption = Komfortkasse_Config::getConfig ( Komfortkasse_Config::encryption );
 		}
